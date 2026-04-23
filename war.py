@@ -39,7 +39,14 @@ def distribute(n_card):
     >>> card.is_card( carte )
     True
     """
-    pass
+    assert n_card > 0, 'n_card doit etre strictement positif'
+    cards = card.deck(2 * n_card)
+    m1 = apqueue.ApQueue()
+    m2 = apqueue.ApQueue()
+    for i in range(n_card):
+        m1.enqueue(cards[i])
+        m2.enqueue(cards[n_card + i])
+    return m1, m2
 
 def gather_stack(main, pile):
     """
@@ -61,7 +68,8 @@ def gather_stack(main, pile):
     >>> all( main.dequeue() == cartes[ 3 - i ] for i in range(3))
     True
     """
-    pass
+    while not pile.is_empty():
+        main.enqueue(pile.pop())
 
 
 def play_one_round(m1, m2, pile):
@@ -83,7 +91,16 @@ def play_one_round(m1, m2, pile):
     :return: None
     :CU: m1 et m2 ne sont pas vides
     """
-    pass
+    c1 = m1.dequeue()
+    c2 = m2.dequeue()
+    pile.push(c1)
+    pile.push(c2)
+
+    cmp_cards = card.compare(c1, c2)
+    if cmp_cards > 0:
+        gather_stack(m1, pile)
+    elif cmp_cards < 0:
+        gather_stack(m2, pile)
 
 
 def play(n_card, n_round):
@@ -94,7 +111,20 @@ def play(n_card, n_round):
     :param n_round: (int) le nombre maximal de tours
     :return: None
     """
-    pass
+    assert n_card > 0 and n_round >= 0, 'parametres invalides'
+    m1, m2 = distribute(n_card)
+    pile = apstack.ApStack()
+
+    round_count = 0
+    while round_count < n_round and not m1.is_empty() and not m2.is_empty():
+        play_one_round(m1, m2, pile)
+        round_count += 1
+
+    if not pile.is_empty():
+        if len(m1) >= len(m2):
+            gather_stack(m1, pile)
+        else:
+            gather_stack(m2, pile)
 
 
 if __name__ == "__main__":

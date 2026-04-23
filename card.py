@@ -95,9 +95,9 @@ def compare(card1, card2):
     >>> compare(carte2, carte3)
     0
     """
-    if VALUES.index(card1['value']) > VALUES.index(card2['value']):
+    if VALUES.index(card1['value']) < VALUES.index(card2['value']):
         return -1
-    elif VALUES.index(card1['value']) < VALUES.index(card2['value']):
+    elif VALUES.index(card1['value']) > VALUES.index(card2['value']):
         return 1
     else:
         return 0
@@ -114,11 +114,12 @@ def is_card(dico):
     >>> is_card( create('Ace', 'spade') )
     True
     """
-    if len(dico)== 2:
-        for c in dico.keys():
-            if c in VALUES and c in COLORS:
-                return True
-    return False
+    return (
+        type(dico) == dict
+        and set(dico.keys()) == {'value', 'color'}
+        and dico['value'] in VALUES
+        and dico['color'] in COLORS
+    )
 
 
 
@@ -134,7 +135,7 @@ def to_str(card):
     >>> to_str( create('8', 'heart'))
     '8 of heart'
     """
-    pass
+    return card['value'] + ' of ' + card['color']
 
 
 
@@ -151,7 +152,9 @@ def deck(n_card):
     >>> all( is_card(c) for c in cartes)
     True
     """
-    pass
+    assert 0 < n_card <= len(COLORS) * len(VALUES), 'nombre de cartes incorrect'
+    all_cards = [create(v, c) for c in COLORS for v in VALUES]
+    return random.sample(all_cards, n_card)
 
 
 
